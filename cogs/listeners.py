@@ -42,7 +42,6 @@ class listeners(commands.Cog):
                 }
                 self.servercol.insert_one(template)
                 await message.add_reaction("🆕")
-                print("Server inserted.")
             
             # If the message channel is blacklisted, stop.
             # Acquire server channel blacklist
@@ -64,7 +63,6 @@ class listeners(commands.Cog):
                 }
                 self.usercol.insert_one(template)
                 await message.add_reaction("✅")
-                print("User inserted")
             else:
                 # Update the user's msg count if there is an entry
                 doc = self.usercol.find(user_query)
