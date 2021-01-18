@@ -31,7 +31,8 @@ Create a new file in ChatBoard's directory called "config.json" (case-sensitive)
 	"token":"<bot token>",
 	"prefix":["<desired prefix>"],
 	"mongo_url":"<MongoDB URL>"
-}```
+}
+```
 
 ### Run
 
