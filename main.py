@@ -1,9 +1,8 @@
-import discord, pymongo, datetime, json
+import discord, datetime, json
 from discord.ext import commands
 
 # Import config info
 import settings
-
 
 intents = discord.Intents.default()
 intents.members = True
@@ -20,21 +19,14 @@ initial_extensions = [
     'cogs.lookup',
     'cogs.leaderboard',
     'cogs.controls',
-    'cogs.help'
+    'cogs.help',
+    'cogs.bot_stat'
 ]
 
 if __name__ == '__main__':
     for extension in initial_extensions:
         bot.load_extension(extension)
     print("[Start] Cogs initialized")
-
-myclient = pymongo.MongoClient(settings.configdata["mongo_url"])
-db = myclient["chatboard"]
-col = db["server_data"]
-print("[Start] Databases linked")
-
-usercol = db["user_data"]
-
 
 @bot.event
 async def on_message(message):
