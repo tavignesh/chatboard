@@ -13,8 +13,9 @@ class leaderboard(commands.Cog):
     usercol = db["user_data"]
 
     # View the server leaderboard
-    @commands.command(aliases=["leaderboard"])
+    @commands.command(aliases=["leader"])
     async def lb(self,ctx):
+        print("leaderboard command found")
         # Find the top 5 users in the user collection
         doc = self.usercol.find({"serverid":ctx.guild.id}).sort("msg_count",-1).limit(5)
         leaderboard_list = []

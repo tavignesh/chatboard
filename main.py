@@ -19,7 +19,8 @@ initial_extensions = [
     'cogs.admin',
     'cogs.lookup',
     'cogs.leaderboard',
-    'cogs.controls'
+    'cogs.controls',
+    'cogs.help'
 ]
 
 if __name__ == '__main__':
@@ -32,23 +33,11 @@ db = myclient["chatboard"]
 col = db["server_data"]
 print("[Start] Databases linked")
 
+usercol = db["user_data"]
+
 
 @bot.event
 async def on_message(message):
     await bot.process_commands(message)
-
-@bot.command()
-async def clear_s(ctx):
-    col.delete_one({"serverid":ctx.guild.id})
-
-@bot.command()
-async def viewdb(ctx):
-    doc = col.find()
-    for x in doc:
-        await ctx.send(x)
-    otherdoc = db["user_data"].find()
-    for i in otherdoc:
-        await ctx.send(i)
-
 
 bot.run(settings.configdata["token"])

@@ -71,14 +71,6 @@ class listeners(commands.Cog):
                 for x in doc:
                     self.usercol.update_one(user_query,{"$set":{"msg_count": x["msg_count"] + 1}})
 
-    # Error listener
-    @commands.Cog.listener('on_command_error')
-    async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            return
-        elif isinstance(error, commands.MissingPermissions):
-            await ctx.send(":warning: You do not have the required permissions to perform this action.")
-            return
 
 def setup(bot):
     bot.add_cog(listeners(bot))
