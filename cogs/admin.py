@@ -1,4 +1,4 @@
-import discord, pymongo
+import discord, pymongo, asyncio
 from discord.ext import commands
 import settings
 
