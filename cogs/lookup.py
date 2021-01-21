@@ -15,7 +15,10 @@ class lookup(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1,3,commands.BucketType.user)
-    async def user(self,ctx,user:discord.Member):
+    async def user(self,ctx,user:discord.Member = None):
+        # If there is no user input, default to the user.
+        if user == None:
+            user = ctx.author
         # View a user's stats in the same server.
         doc = self.usercol.find({"userid":user.id,"serverid":ctx.guild.id})
         for x in doc:
