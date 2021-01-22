@@ -1,10 +1,24 @@
-import json
+import json,pymongo
 try:
+    # Load config.json
     with open('config.json', 'r') as config_file:
+        # Define its contents as configdata
         configdata = json.load(config_file)
-        token = configdata["token"]
-        prefix = configdata["prefix"]
-        mongo_url = configdata["mongo_url"]
 except:
-    print("Invalid config.json file! Exiting now.")
+    print("[ERROR] Invalid config.json file! Exiting now.")
     exit()
+
+print("[Start] Config.json loaded")
+
+try:
+    # Connect to MongoDB server
+    myclient = pymongo.MongoClient(configdata["mongo_url"])
+except:
+    print("[ERROR] There was an error connecting to MongoDB. Invalid URL in config.json maybe? Exiting now.")
+    exit()
+# Define the main database and collections as variables
+db = myclient["chatboard"]
+servercol = db["server_data"]
+usercol = db["user_data"]
+
+print("[Start] Database and collections defined")

@@ -8,11 +8,6 @@ class controls(commands.Cog):
         self.bot = bot
         # Re-define the bot object into the class.
 
-    myclient = pymongo.MongoClient(settings.configdata["mongo_url"])
-    db = myclient["chatboard"]
-    servercol = db["server_data"]
-    usercol = db["user_data"]
-
     @commands.command()
     @commands.cooldown(1,15,commands.BucketType.user)
     async def data(self,ctx,parameters=None):
@@ -22,7 +17,7 @@ class controls(commands.Cog):
         # View data
         if parameters == None or parameters == "view":
             # Search for the user in the user collection and strip the internal ID
-            userdoc = self.usercol.find({"userid":ctx.author.id,"serverid":ctx.guild.id},{"_id":0})
+            userdoc = settings.usercol.find({"userid":ctx.author.id,"serverid":ctx.guild.id},{"_id":0})
             for x in userdoc:
                 # Attempt to send the user a DM with their data.
                 # If the bot fails to send, alert the user. Otherwise, proceed like normal.
@@ -60,7 +55,7 @@ class controls(commands.Cog):
             else:
                 # If the user reacts with the check mark emoji, delete their data.
                 if str(reaction.emoji) == "✅":
-                    self.usercol.delete_many({"userid":ctx.author.id,"serverid":ctx.guild.id})
+                    settings.usercol.delete_many({"userid":ctx.author.id,"serverid":ctx.guild.id})
                     embed=discord.Embed(title="Data Deleted", description=f"**ALL DATA** about you within {ctx.guild.name} has been permanently erased.", color=0x008000)
                     embed.set_author(name=ctx.author.name + "#" + str(ctx.author.discriminator), icon_url=f"{ctx.author.avatar_url}")
                     embed.set_footer(text="Made by http.james#6969")

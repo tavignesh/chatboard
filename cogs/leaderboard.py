@@ -7,16 +7,12 @@ class leaderboard(commands.Cog):
         self.bot = bot
         # Re-define the bot object into the class.
 
-    myclient = pymongo.MongoClient(settings.configdata["mongo_url"])
-    db = myclient["chatboard"]
-    servercol = db["server_data"]
-    usercol = db["user_data"]
-
     # View the server leaderboard
     @commands.command(aliases=["leader"])
+    @commands.cooldown(1,5,commands.BucketType.guild)
     async def lb(self,ctx):
         # Find the top 5 users in the user collection
-        doc = self.usercol.find({"serverid":ctx.guild.id}).sort("msg_count",-1).limit(5)
+        doc = settings.usercol.find({"serverid":ctx.guild.id}).sort("msg_count",-1).limit(5)
         leaderboard_list = []
         counter = 1
         for x in doc:

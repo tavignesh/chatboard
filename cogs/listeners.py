@@ -8,11 +8,6 @@ class listeners(commands.Cog):
         self.bot = bot
         # Re-define the bot object into the class.
 
-    myclient = pymongo.MongoClient(settings.configdata["mongo_url"])
-    db = myclient["chatboard"]
-    servercol = db["server_data"]
-    usercol = db["user_data"]
-
     # When the bot logs in, print bot details to console
     @commands.Cog.listener('on_ready')
     async def on_ready(self):
@@ -32,7 +27,7 @@ class listeners(commands.Cog):
                 "serverid":message.guild.id
             }
             server_query = { "serverid": message.guild.id }
-            if (self.db.server_data.count_documents(server_query, limit = 1) != 1):
+            if (settings.db.server_data.count_documents(server_query, limit = 1) != 1):
                 # Create a new server entry if there is none
                 template = {
                     "serverid":message.guild.id,
@@ -40,20 +35,20 @@ class listeners(commands.Cog):
                     "channel_blacklist":[],
                     "timestamp":dt.datetime.now()
                 }
-                self.servercol.insert_one(template)
+                settings.servercol.insert_one(template)
                 await message.add_reaction("🆕")
             
             # If the message channel is blacklisted, stop.
             # Acquire server channel blacklist
-            blacklist_doc = self.servercol.find(server_query)
+            blacklist_doc = settings.servercol.find(server_query)
             for xy in blacklist_doc:
                 if (message.channel.id in xy["channel_blacklist"]):
                     return
             # Otherwise, continue to create user entries and update message counts.
-            server_doc = self.servercol.find(server_query)
+            server_doc = settings.servercol.find(server_query)
             for y in server_doc:
-                self.servercol.update_one(server_query,{"$set":{"msg_count":y["msg_count"] + 1}})
-            if (self.db.user_data.count_documents(user_query, limit = 1) != 1):
+                settings.servercol.update_one(server_query,{"$set":{"msg_count":y["msg_count"] + 1}})
+            if (settings.db.user_data.count_documents(user_query, limit = 1) != 1):
                 # Create a new user entry if there is none
                 template = {
                     "userid":message.author.id,
@@ -61,14 +56,18 @@ class listeners(commands.Cog):
                     "msg_count":1,
                     "timestamp": dt.datetime.now()
                 }
-                self.usercol.insert_one(template)
+                settings.usercol.insert_one(template)
                 await message.add_reaction("✅")
             else:
                 # Update the user's msg count if there is an entry
-                doc = self.usercol.find(user_query)
+                doc = settings.usercol.find(user_query)
                 for x in doc:
-                    self.usercol.update_one(user_query,{"$set":{"msg_count": x["msg_count"] + 1}})
+                    settings.usercol.update_one(user_query,{"$set":{"msg_count": x["msg_count"] + 1}})
 
-
+    @commands.Cog.listener('on_command_error')
+    async def on_command_error(self,ctx,error):
+        if isinstance(error, commands.CommandOnCooldown):
+            # Avoid flooding the console when a command is spammed
+            return
 def setup(bot):
     bot.add_cog(listeners(bot))

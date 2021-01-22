@@ -20,7 +20,7 @@ class lookup(commands.Cog):
         if user == None:
             user = ctx.author
         # View a user's stats in the same server.
-        doc = self.usercol.find({"userid":user.id,"serverid":ctx.guild.id})
+        doc = settings.usercol.find({"userid":user.id,"serverid":ctx.guild.id})
         for x in doc:
             time = x["timestamp"].strftime("%m/%d/%Y, %H:%M:%S")
             embed=discord.Embed(title=user.name + "#" + str(user.discriminator), color=0x008080)
@@ -33,7 +33,7 @@ class lookup(commands.Cog):
     @commands.cooldown(1,10,commands.BucketType.user)
     async def server(self,ctx):
         # View the server's global stats.
-        doc = self.servercol.find({"serverid":ctx.guild.id})
+        doc = settings.servercol.find({"serverid":ctx.guild.id})
         for x in doc:
             time = x["timestamp"].strftime("%m/%d/%Y, %H:%M:%S")
             embed=discord.Embed(title=ctx.guild.name, color=0xBB4411)
