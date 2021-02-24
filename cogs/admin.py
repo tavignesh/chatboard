@@ -99,6 +99,45 @@ class admin(commands.Cog):
             embed.set_footer(text="Made by http.james#6969")
             # Edit the first embed
             await reset.edit(embed=embed)
+        
+    @commands.command()
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(4,10,commands.BucketType.user)
+    async def alert(self,ctx,trigger=None):
+        # Allow server managers to set message alerts.
+        # Once the message count equals the alert, the bot notifies the server of the achivement.
+        try:
+            # Accept only integers, if it's not an integer abort.
+            num = int(trigger)
+        except:
+            await ctx.send(":warning: The trigger must be an integer!")
+            return
+        query = { "serverid":ctx.guild.id }
+        doc = settings.servercol.find(query)
+        for x in doc:
+            # If the desired alert count is fewer than the current message count, abort.
+            if num < x["msg_count"] + 1:
+                await ctx.send(":warning: You can't set an alert for the past...")
+                return
+
+            try:
+                # If the server doesn't already have an alert field, create one.
+                alerts = x["alerts"]
+            except:
+                alerts = []
+                alerts.append(num)
+                settings.servercol.update_one(query,{"$set":{"alerts":alerts}})
+                await ctx.send(":white_check_mark: Successfully added **" + trigger + "** to server count alerts.")
+                return
+            if num in alerts:
+                # Do not accept duplicate alerts.
+                await ctx.send(":warning: You already added this alert!")
+                return
+            alerts.append(num)
+            alerts.sort()
+            settings.servercol.update_one(query,{"$set":{"alerts":alerts}})
+            await ctx.send(":white_check_mark: Successfully added **" + trigger + "** to server count alerts.")
+            return
 
 def setup(bot):
     bot.add_cog(admin(bot))

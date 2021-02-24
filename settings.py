@@ -1,4 +1,4 @@
-import json,pymongo
+import json,pymongo,discord
 try:
     # Load config.json
     with open('config.json', 'r') as config_file:

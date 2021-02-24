@@ -10,13 +10,18 @@ class leaderboard(commands.Cog):
     # View the server leaderboard
     @commands.command(aliases=["leader"])
     @commands.cooldown(1,5,commands.BucketType.guild)
-    async def lb(self,ctx):
-        # Find the top 5 users in the user collection
-        doc = settings.usercol.find({"serverid":ctx.guild.id}).sort("msg_count",-1).limit(5)
+    async def lb(self,ctx,limit=5):
+        # Find the top X users in the user collection
+        if limit > 15:
+            limit = 15
+        doc = settings.usercol.find({"serverid":ctx.guild.id}).sort("msg_count",-1).limit(int(limit))
         leaderboard_list = []
         counter = 1
         for x in doc:
-            user_obj = self.bot.get_user(x["userid"])
+            try:
+                user_obj = self.bot.get_user(x["userid"])
+            except:
+                continue
             leaderboard_list.append(str(counter) + ". " + user_obj.name + "#" + str(user_obj.discriminator) + " | " + str(x["msg_count"]))
             counter += 1
         if len(leaderboard_list) < 1:

@@ -44,10 +44,12 @@ class listeners(commands.Cog):
             for xy in blacklist_doc:
                 if (message.channel.id in xy["channel_blacklist"]):
                     return
+
             # Otherwise, continue to create user entries and update message counts.
             server_doc = settings.servercol.find(server_query)
             for y in server_doc:
                 settings.servercol.update_one(server_query,{"$set":{"msg_count":y["msg_count"] + 1}})
+
             if (settings.db.user_data.count_documents(user_query, limit = 1) != 1):
                 # Create a new user entry if there is none
                 template = {
@@ -63,6 +65,28 @@ class listeners(commands.Cog):
                 doc = settings.usercol.find(user_query)
                 for x in doc:
                     settings.usercol.update_one(user_query,{"$set":{"msg_count": x["msg_count"] + 1}})
+
+            server_doc = settings.servercol.find(server_query)
+            for z in server_doc:
+                # Check for alerts
+
+                # If there's an alert field, proceed.
+                try:
+                    alerts = z["alerts"]
+                except:
+                    return
+
+                # If the alerts list is not empty:    
+                if len(z["alerts"]) > 0:
+                    # If the server's message count is the alert, send the alert.
+                    if z["msg_count"] == alerts[0]:
+                        alert_embed=discord.Embed(title="🎉 Alert Triggered", description=f"**{message.guild.name}** has hit **" + str(alerts[0]) + " messages**!", color=0x38fcf7)
+                        alert_embed.set_author(name=f"{message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
+                        alert_embed.set_footer(text="Made by http.james#6969")
+                        await message.channel.send(embed=alert_embed)
+                        # Delete the alert once it's triggered.
+                        del alerts[0]
+                        settings.servercol.update_one(server_query,{"$set":{"alerts":alerts}})
 
     @commands.Cog.listener('on_command_error')
     async def on_command_error(self,ctx,error):
