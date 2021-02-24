@@ -20,8 +20,8 @@ class listeners(commands.Cog):
     @commands.Cog.listener('on_message')
     async def on_message(self,message):
 
-        # If the message author is not the bot itself and the message is not a DM
-        if (message.author.id != self.bot.user.id) and not (not message.guild):
+        # If the message author is not the bot itself or a bot user and the message is not a DM
+        if (message.author.id != self.bot.user.id) and not (not message.guild) and (message.author.bot == False):
             user_query = {
                 "userid":message.author.id,
                 "serverid":message.guild.id
